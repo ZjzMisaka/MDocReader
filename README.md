@@ -1,5 +1,5 @@
 # MDocReader
-Reading Markdown documents (e.g., GitHub wiki)
+Reading Markdown documents (e.g., GitHub wiki)  
 The initial purpose of this project is to help users who find it inconvenient to browse Github wikis by allowing them to view markdown-format wiki documents locally.  
 
 ### Usage
