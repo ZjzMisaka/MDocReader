@@ -125,7 +125,7 @@ namespace MDocReader
 </script>";
             }
 
-            var pipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub).Build();
+            var pipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub).UseAdvancedExtensions().Build();
             string htmlContent = Markdown.ToHtml(markdown, pipeline);
 
             return $@"
