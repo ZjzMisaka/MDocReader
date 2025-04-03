@@ -43,7 +43,7 @@ namespace MDocReader
             if (File.Exists(mainFilePath))
             {
                 string mainMarkdown = File.ReadAllText(mainFilePath);
-                MainWebBrowser.NavigateToString(ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
+                MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
 
             string sidebarFilePath = _sidebarPath;
@@ -52,7 +52,7 @@ namespace MDocReader
                 string sidebarMarkdown = File.ReadAllText(sidebarFilePath);
                 if (!string.IsNullOrWhiteSpace(sidebarMarkdown))
                 {
-                    SidebarWebBrowser.NavigateToString(ConvertMarkdownToHtml(sidebarMarkdown));
+                    SidebarWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(sidebarMarkdown));
                     SidebarWebBrowser.Visibility = Visibility.Visible;
                     SidebarGridSplitter.Visibility = Visibility.Visible;
                 }
@@ -64,7 +64,7 @@ namespace MDocReader
                 string footerMarkdown = File.ReadAllText(footerFilePath);
                 if (!string.IsNullOrWhiteSpace(footerMarkdown))
                 {
-                    FooterWebBrowser.NavigateToString(ConvertMarkdownToHtml(footerMarkdown));
+                    FooterWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(footerMarkdown));
                     FooterWebBrowser.Visibility = Visibility.Visible;
                     FooterGridSplitter.Visibility = Visibility.Visible;
                 }
@@ -95,7 +95,7 @@ namespace MDocReader
                 }
                 _mainPath = urlWithMD;
                 _mainFragment = e.Uri.Fragment;
-                MainWebBrowser.NavigateToString(ConvertMarkdownToHtml(mainMarkdown, e.Uri.Fragment));
+                MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, e.Uri.Fragment));
             }
             else
             {
@@ -107,141 +107,6 @@ namespace MDocReader
             }
         }
 
-        private string ConvertMarkdownToHtml(string markdown, string fragment = null)
-        {
-            string scrollScript = string.Empty;
-            if (!string.IsNullOrEmpty(fragment))
-            {
-                fragment = Uri.UnescapeDataString(fragment);
-                scrollScript = $@"
-<script>
-    (function() {{
-        // Wait for the DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {{
-            // Extract the fragment and remove the leading '#' if it exists
-            var targetId = '{fragment}'.charAt(0) === '#' ? '{fragment}'.substring(1) : '{fragment}';
-            
-            // Find the target element by ID
-            var targetElement = document.getElementById(targetId);
-            
-            // If the element exists, scroll to it
-            if (targetElement) {{
-                targetElement.scrollIntoView({{
-                    behavior: 'smooth', // Smooth scrolling (ignored in older IE versions)
-                    block: 'start'     // Align to the top of the element
-                }});
-            }}
-        }});
-    }})();
-</script>";
-            }
-
-            var pipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub).UseAdvancedExtensions().Build();
-            string htmlContent = Markdown.ToHtml(markdown, pipeline);
-
-            return $@"
-{GetHtmlStart()}
-<body>
-    {htmlContent}
-    {scrollScript}
-</body>
-</html>";
-        }
-
-        private string GetHtmlStart()
-        {
-            return $@"<!DOCTYPE html>
-                    <html lang=""en"">
-                    <head>
-                        <meta charset=""UTF-8"">
-                        <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                        <title>Document</title>
-                        <style>
-                            html {{
-                                overflow: auto;
-                                {ThemeHelper.ScrollbarStyleText}
-                            }}
-
-                            body {{
-                                background-color: {ThemeHelper.BackgroundColorText};
-                                color: {ThemeHelper.ForegroundColorText};
-                            }}
-
-                            a {{
-                                text-decoration: none;
-                                color: {ThemeHelper.ForegroundColorLink};
-                            }}
-
-                            a:visited {{
-                                color: {ThemeHelper.ForegroundColorLink};
-                            }}
-
-                            p, ul, ol {{
-                                margin-top: 0.5em;
-                                margin-bottom: 0.5em;
-                            }}
-
-                            code {{
-                                background-color: {ThemeHelper.CodeBackgroundColor};
-                                color: {ThemeHelper.PreForegroundColorText};
-                                padding: 0.2em 0.4em;
-                                border-radius: 4px;
-                                font-family: Consolas, ""Courier New"", monospace;
-                                font-size: 0.95em;
-                                display: inline-block;
-                                white-space: pre;
-                                vertical-align: middle;
-                                overflow: hidden;
-                            }}
-
-                            pre code {{
-                                display: block;
-                                padding: 1em;
-                                overflow-x: auto;
-                            }}
-
-                            pre {{
-                                background-color: {ThemeHelper.PreBackgroundColorText};
-                                color: {ThemeHelper.PreForegroundColorText};
-                                padding: 0.2em;
-                                border-radius: 4px;
-                                font-family: Consolas, ""Courier New"", monospace;
-                                font-size: 0.95em;
-                                overflow: auto;
-                            }}
-
-                            table {{
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin: 1em 0;
-                                background-color: {ThemeHelper.PreBackgroundColorText};
-                                color: {ThemeHelper.PreForegroundColorText};
-                                font-family: Arial, sans-serif;
-                                font-size: 0.95em;
-                            }}
-
-                            th, td {{
-                                padding: 0.6em 0.8em;
-                                border: 1px solid #444;
-                                text-align: left;
-                            }}
-
-                            th {{
-                                background-color: {ThemeHelper.TableHeaderBackgroundColorText};
-                                font-weight: bold;
-                            }}
-
-                            tr:nth-child(even) {{
-                                background-color: {ThemeHelper.PreEvenBackgroundColorText};
-                            }}
-
-                            tr:hover {{
-                                background-color: {ThemeHelper.TableHoverBackgroundColorText};
-                            }}
-                        </style>
-
-                    </head>";
-        }
 
         private void SetBrowserFeatureControl()
         {
@@ -288,31 +153,13 @@ namespace MDocReader
         {
             if (FileListWebBrowser.Visibility == Visibility.Visible)
             {
-                FileListWebBrowser.NavigateToString(ConvertMarkdownToHtml(GetMarkdownFileNames()));
+                FileListWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(MDHelper.GetMarkdownFileNames()));
             }
         }
 
         private void ChangeTheme(object sender, RoutedEventArgs e)
         {
             ChangeTheme();
-        }
-
-        static string GetMarkdownFileNames()
-        {
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string[] markdownFiles = Directory.GetFiles(currentDirectory, "*.md");
-            string result = "";
-            foreach (string filePath in markdownFiles)
-            {
-                string fileName = Path.GetFileName(filePath);
-                if (fileName == "_Sidebar.md" || fileName == "_Footer.md")
-                {
-                    continue;
-                }
-                result += $"- [{fileName}]({Path.GetFileNameWithoutExtension(filePath)})\n";
-            }
-
-            return result;
         }
     }
 }
