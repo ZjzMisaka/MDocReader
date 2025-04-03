@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -10,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using Markdig;
+using Markdig.Extensions.AutoIdentifiers;
 
 namespace MDocReader
 {
@@ -76,7 +78,7 @@ namespace MDocReader
                 return;
             }
             e.Cancel = true;
-            string url = e.Uri.AbsolutePath;
+            string url = Uri.UnescapeDataString(e.Uri.AbsolutePath);
             string urlWithMD = $"{e.Uri.AbsolutePath}.md";
             if (!string.IsNullOrEmpty(urlWithMD) && File.Exists(urlWithMD))
             {
@@ -104,6 +106,7 @@ namespace MDocReader
             string scrollScript = string.Empty;
             if (!string.IsNullOrEmpty(fragment))
             {
+                fragment = Uri.UnescapeDataString(fragment);
                 scrollScript = $@"
 <script>
     (function() {{
@@ -127,7 +130,7 @@ namespace MDocReader
 </script>";
             }
 
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            var pipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub).Build();
             string htmlContent = Markdown.ToHtml(markdown, pipeline);
 
             return $@"
