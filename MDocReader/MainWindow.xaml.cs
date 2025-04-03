@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MDocReader
 {
@@ -162,6 +165,15 @@ namespace MDocReader
                             body {{
                                 background-color: {ThemeHelper.BackgroundColorText};
                                 color: {ThemeHelper.ForegroundColorText};
+                            }}
+
+                            a {{
+                                text-decoration: none;
+                                color: {ThemeHelper.ForegroundColorLink};
+                            }}
+
+                            a:visited {{
+                                color: {ThemeHelper.ForegroundColorLink};
                             }}
 
                             p, ul, ol {{

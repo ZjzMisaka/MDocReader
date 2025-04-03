@@ -117,6 +117,21 @@ namespace MDocReader
             }
         }
 
+        public static string ForegroundColorLink
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return "rgb(0, 167, 255)";
+                }
+                else
+                {
+                    return "rgb(0, 0, 255)";
+                }
+            }
+        }
+
         public static string TableHeaderBackgroundColorText
         {
             get
