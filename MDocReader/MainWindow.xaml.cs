@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
@@ -17,10 +12,10 @@ namespace MDocReader
 {
     public partial class MainWindow : Window
     {
-        private string mainPath = "Home.md";
-        private string mainFragment = "";
-        private string sidebarPath = "_Sidebar.md";
-        private string footerPath = "_Footer.md";
+        private string _mainPath = "Home.md";
+        private string _mainFragment = "";
+        private string _sidebarPath = "_Sidebar.md";
+        private string _footerPath = "_Footer.md";
 
         public MainWindow()
         {
@@ -39,14 +34,14 @@ namespace MDocReader
 
         private void LoadMarkdownFiles()
         {
-            string mainFilePath = mainPath;
+            string mainFilePath = _mainPath;
             if (File.Exists(mainFilePath))
             {
                 string mainMarkdown = File.ReadAllText(mainFilePath);
-                MainWebBrowser.NavigateToString(ConvertMarkdownToHtml(mainMarkdown, mainFragment));
+                MainWebBrowser.NavigateToString(ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
 
-            string sidebarFilePath = sidebarPath;
+            string sidebarFilePath = _sidebarPath;
             if (File.Exists(sidebarFilePath))
             {
                 string sidebarMarkdown = File.ReadAllText(sidebarFilePath);
@@ -58,7 +53,7 @@ namespace MDocReader
                 }
             }
 
-            string footerFilePath = footerPath;
+            string footerFilePath = _footerPath;
             if (File.Exists(footerFilePath))
             {
                 string footerMarkdown = File.ReadAllText(footerFilePath);
@@ -87,8 +82,8 @@ namespace MDocReader
                 {
                     mainMarkdown = $"# {url}\n{mainMarkdown}";
                 }
-                mainPath = urlWithMD;
-                mainFragment = e.Uri.Fragment;
+                _mainPath = urlWithMD;
+                _mainFragment = e.Uri.Fragment;
                 MainWebBrowser.NavigateToString(ConvertMarkdownToHtml(mainMarkdown, e.Uri.Fragment));
             }
             else
