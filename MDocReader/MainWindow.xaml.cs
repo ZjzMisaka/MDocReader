@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
@@ -30,6 +31,7 @@ namespace MDocReader
             MainWebBrowser.Navigating += WebBrowserNavigating;
             SidebarWebBrowser.Navigating += WebBrowserNavigating;
             FooterWebBrowser.Navigating += WebBrowserNavigating;
+            FileListWebBrowser.Navigating += WebBrowserNavigating;
         }
 
         private void LoadMarkdownFiles()
@@ -64,6 +66,12 @@ namespace MDocReader
                     FooterGridSplitter.Visibility = Visibility.Visible;
                 }
             }
+
+            ShowFileList();
+
+            ToolBar.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.BackgroundColorToolBar));
+            FileListBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.FileListBtnUri));
+            ChangeThemeBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ChangeThemeBtnUri));
         }
 
         private void WebBrowserNavigating(object sender, NavigatingCancelEventArgs e)
@@ -250,8 +258,49 @@ namespace MDocReader
             LoadMarkdownFiles();
             SidebarGridSplitter.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBackColor));
             FooterGridSplitter.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBackColor));
+            FileListGridSplitter.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBackColor));
             SidebarGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
             FooterGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
+            FileListGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
+        }
+
+        private void FileListBtnClick(object sender, RoutedEventArgs e)
+        {
+            FileListWebBrowser.Visibility = FileListWebBrowser.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            FileListGridSplitter.Visibility = FileListWebBrowser.Visibility;
+
+            ShowFileList();
+        }
+
+        private void ShowFileList()
+        {
+            if (FileListWebBrowser.Visibility == Visibility.Visible)
+            {
+                FileListWebBrowser.NavigateToString(ConvertMarkdownToHtml(GetMarkdownFileNames()));
+            }
+        }
+
+        private void ChangeTheme(object sender, RoutedEventArgs e)
+        {
+            ChangeTheme();
+        }
+
+        static string GetMarkdownFileNames()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string[] markdownFiles = Directory.GetFiles(currentDirectory, "*.md");
+            string result = "";
+            foreach (string filePath in markdownFiles)
+            {
+                string fileName = Path.GetFileName(filePath);
+                if (fileName == "_Sidebar.md" || fileName == "_Footer.md")
+                {
+                    continue;
+                }
+                result += $"- [{fileName}]({Path.GetFileNameWithoutExtension(filePath)})\n";
+            }
+
+            return result;
         }
     }
 }

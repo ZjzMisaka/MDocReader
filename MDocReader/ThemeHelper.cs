@@ -12,6 +12,21 @@ namespace MDocReader
     {
         public static Theme Theme { get; set; } = Theme.Light;
 
+        public static string BackgroundColorToolBar
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return "rgb(67, 67, 67)";
+                }
+                else
+                {
+                    return "rgb(245, 245, 245)";
+                }
+            }
+        }
+
         public static string BackgroundColorText
         {
             get
@@ -180,6 +195,36 @@ namespace MDocReader
                 else
                 {
                     return "rgb(169, 169, 169)";
+                }
+            }
+        }
+
+        public static Uri FileListBtnUri
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return new Uri(@"pack://application:,,,/Resource/list-view-white.png", UriKind.RelativeOrAbsolute);
+                }
+                else
+                {
+                    return new Uri(@"pack://application:,,,/Resource/list-view-black.png", UriKind.RelativeOrAbsolute);
+                }
+            }
+        }
+
+        public static Uri ChangeThemeBtnUri
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return new Uri(@"pack://application:,,,/Resource/theme-white.png", UriKind.RelativeOrAbsolute);
+                }
+                else
+                {
+                    return new Uri(@"pack://application:,,,/Resource/theme-black.png", UriKind.RelativeOrAbsolute);
                 }
             }
         }
