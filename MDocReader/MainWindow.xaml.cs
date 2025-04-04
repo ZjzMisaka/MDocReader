@@ -140,6 +140,21 @@ namespace MDocReader
                 {
                     ChangeTheme();
                 }
+                else if (e.Key == Key.S)
+                {
+                    Save();
+                }
+            }
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                if (e.Key == Key.Left)
+                {
+                    Back();
+                }
+                else if (e.Key == Key.Right)
+                {
+                    Forward();
+                }
             }
         }
 
@@ -185,6 +200,16 @@ namespace MDocReader
 
         private void BackBtnClick(object sender, RoutedEventArgs e)
         {
+            Back();
+        }
+
+        private void ForwardBtnClick(object sender, RoutedEventArgs e)
+        {
+            Forward();
+        }
+
+        private void Back()
+        {
             if (_historyIndex - 1 < 0)
             {
                 return;
@@ -199,9 +224,9 @@ namespace MDocReader
                 mainMarkdown = $"# {url}\n{mainMarkdown}";
             }
             MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
-        }
+        } 
 
-        private void ForwardBtnClick(object sender, RoutedEventArgs e)
+        private void Forward()
         {
             if (_historyIndex + 1 > _history.Count - 1)
             {
@@ -220,6 +245,11 @@ namespace MDocReader
         }
 
         private void Save(object sender, RoutedEventArgs e)
+        {
+            Save();
+        }
+
+        private void Save()
         {
             Dictionary<string, string> filesToPersist = new Dictionary<string, string>();
             string currentDirectory = Directory.GetCurrentDirectory();
