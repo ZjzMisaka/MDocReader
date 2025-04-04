@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>net8.0-windows;net481;</TargetFrameworks>
     <UseWPF>true</UseWPF>
+    <SatelliteResourceLanguages></SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>

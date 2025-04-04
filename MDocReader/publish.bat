@@ -1,0 +1,9 @@
+@echo off
+dotnet publish MDocReader.csproj -c Release -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net481 -o bin\Release\publish-x64-net481
+dotnet publish MDocReader.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net8.0-windows -o bin\Release\publish-single-file-x64-net8.0
+dotnet publish MDocReader.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net8.0-windows -o bin\Release\publish-single-file-x64-net8.0-self-contained
+dotnet publish MDocReader.csproj -c Release -r win-x86 /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net481 -o bin\Release\publish-x86-net481
+dotnet publish MDocReader.csproj -c Release -r win-x86 --self-contained false /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net8.0-windows -o bin\Release\publish-single-file-x86-net8.0
+dotnet publish MDocReader.csproj -c Release -r win-x86 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false /p:InvariantGlobalization=true --framework net8.0-windows -o bin\Release\publish-single-file-x86-net8.0-self-contained
+echo ok
+pause
