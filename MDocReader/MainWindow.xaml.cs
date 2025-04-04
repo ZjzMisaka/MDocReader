@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Security.Policy;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using Markdig;
-using Markdig.Extensions.AutoIdentifiers;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MDocReader
 {
@@ -23,7 +17,7 @@ namespace MDocReader
         private string _sidebarPath = "_Sidebar.md";
         private string _footerPath = "_Footer.md";
 
-        private List<string> _history = new List<string>();
+        private List<History> _history = new List<History>();
         private int _historyIndex = -1;
 
         public MainWindow()
@@ -47,7 +41,7 @@ namespace MDocReader
             string mainFilePath = _mainPath;
             if (File.Exists(mainFilePath))
             {
-                _history.Add(mainFilePath);
+                _history.Add(new History(_mainPath, _mainFragment));
                 ++_historyIndex;
                 string mainMarkdown = File.ReadAllText(mainFilePath);
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
@@ -96,8 +90,6 @@ namespace MDocReader
                     _history.RemoveRange(_historyIndex + 1, _history.Count - (_historyIndex + 1));
                 }
 
-                _history.Add(urlWithMD);
-                ++_historyIndex;
                 string mainMarkdown = File.ReadAllText(urlWithMD);
                 if (url != "Home")
                 {
@@ -105,6 +97,8 @@ namespace MDocReader
                 }
                 _mainPath = urlWithMD;
                 _mainFragment = e.Uri.Fragment;
+                _history.Add(new History(_mainPath, _mainFragment));
+                ++_historyIndex;
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, e.Uri.Fragment));
             }
             else
@@ -184,7 +178,9 @@ namespace MDocReader
             {
                 return;
             }
-            _mainPath = _history[--_historyIndex];
+            --_historyIndex;
+            _mainPath = _history[_historyIndex].Path;
+            _mainFragment = _history[_historyIndex].Fragment;
             string mainMarkdown = File.ReadAllText(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
@@ -200,7 +196,9 @@ namespace MDocReader
             {
                 return;
             }
-            _mainPath = _history[++_historyIndex];
+            ++_historyIndex;
+            _mainPath = _history[_historyIndex].Path;
+            _mainFragment = _history[_historyIndex].Fragment;
             string mainMarkdown = File.ReadAllText(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
