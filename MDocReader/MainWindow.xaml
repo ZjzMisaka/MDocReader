@@ -17,7 +17,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid x:Name="ToolBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+        <Grid x:Name="ToolBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="#f5f5f5">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
                 <Button x:Name="BackBtn" Width="20" Height="20" Margin="5 0 0 0" Click="BackBtnClick">
                     <Button.Background>
