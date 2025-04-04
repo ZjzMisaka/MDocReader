@@ -229,6 +229,36 @@ namespace MDocReader
             }
         }
 
+        public static Uri BackBtnUri
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return new Uri(@"pack://application:,,,/Resource/left-white.png", UriKind.RelativeOrAbsolute);
+                }
+                else
+                {
+                    return new Uri(@"pack://application:,,,/Resource/left-black.png", UriKind.RelativeOrAbsolute);
+                }
+            }
+        }
+
+        public static Uri ForwardBtnUri
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return new Uri(@"pack://application:,,,/Resource/right-white.png", UriKind.RelativeOrAbsolute);
+                }
+                else
+                {
+                    return new Uri(@"pack://application:,,,/Resource/right-black.png", UriKind.RelativeOrAbsolute);
+                }
+            }
+        }
+
         public static Uri ChangeThemeBtnUri
         {
             get

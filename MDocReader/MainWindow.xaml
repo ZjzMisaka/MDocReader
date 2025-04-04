@@ -19,6 +19,16 @@
         </Grid.ColumnDefinitions>
         <Grid x:Name="ToolBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                <Button x:Name="BackBtn" Width="20" Height="20" Margin="5 0 0 0" Click="BackBtnClick">
+                    <Button.Background>
+                        <ImageBrush ImageSource="pack://application:,,,/Resource/left-black.png" />
+                    </Button.Background>
+                </Button>
+                <Button x:Name="ForwardBtn" Width="20" Height="20" Margin="5 0 0 0" Click="ForwardBtnClick">
+                    <Button.Background>
+                        <ImageBrush ImageSource="pack://application:,,,/Resource/right-black.png" />
+                    </Button.Background>
+                </Button>
                 <Button x:Name="FileListBtn" Width="20" Height="20" Margin="5 0 0 0" Click="FileListBtnClick">
                     <Button.Background>
                         <ImageBrush ImageSource="pack://application:,,,/Resource/list-view-black.png" />
@@ -40,16 +50,17 @@
                 <RowDefinition Height="35" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="399*" />
+                <ColumnDefinition Width="116*"/>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="250" />
             </Grid.ColumnDefinitions>
 
-            <WebBrowser x:Name="MainWebBrowser" Grid.Row="0" Grid.Column="0" />
-            <GridSplitter x:Name="FooterGridSplitter" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="4" HorizontalAlignment="Stretch" BorderThickness="0 1" BorderBrush="LightGray" Visibility="Collapsed" />
-            <WebBrowser x:Name="FooterWebBrowser" Grid.Row="2" Grid.Column="0" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Visibility="Collapsed" />
-            <GridSplitter x:Name="SidebarGridSplitter" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="4" VerticalAlignment="Stretch" HorizontalAlignment="Center" BorderThickness="1 0" BorderBrush="LightGray" Visibility="Collapsed" />
-            <WebBrowser x:Name="SidebarWebBrowser" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Visibility="Collapsed" />
+            <WebBrowser x:Name="MainWebBrowser" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,35" Grid.RowSpan="3" />
+            <GridSplitter x:Name="FooterGridSplitter" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Height="4" HorizontalAlignment="Stretch" BorderThickness="0 1" BorderBrush="LightGray" Visibility="Collapsed" Margin="0,0,0,31" Grid.RowSpan="2" />
+            <WebBrowser x:Name="FooterWebBrowser" Grid.Row="2" Grid.Column="0" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Visibility="Collapsed" Grid.ColumnSpan="2" />
+            <GridSplitter x:Name="SidebarGridSplitter" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="4" HorizontalAlignment="Left" BorderThickness="1 0" BorderBrush="LightGray" Visibility="Collapsed" Grid.ColumnSpan="3" Margin="230,0,0,0" />
+            <WebBrowser x:Name="SidebarWebBrowser" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Visibility="Collapsed" Grid.ColumnSpan="2" />
         </Grid>
     </Grid>
 </Window>

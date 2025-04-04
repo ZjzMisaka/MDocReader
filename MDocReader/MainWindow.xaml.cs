@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,6 +22,9 @@ namespace MDocReader
         private string _mainFragment = "";
         private string _sidebarPath = "_Sidebar.md";
         private string _footerPath = "_Footer.md";
+
+        private List<string> _history = new List<string>();
+        private int _historyIndex = -1;
 
         public MainWindow()
         {
@@ -42,6 +47,8 @@ namespace MDocReader
             string mainFilePath = _mainPath;
             if (File.Exists(mainFilePath))
             {
+                _history.Add(mainFilePath);
+                ++_historyIndex;
                 string mainMarkdown = File.ReadAllText(mainFilePath);
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
@@ -71,10 +78,6 @@ namespace MDocReader
             }
 
             ShowFileList();
-
-            ToolBar.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.BackgroundColorToolBar));
-            FileListBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.FileListBtnUri));
-            ChangeThemeBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ChangeThemeBtnUri));
         }
 
         private void WebBrowserNavigating(object sender, NavigatingCancelEventArgs e)
@@ -88,6 +91,13 @@ namespace MDocReader
             string urlWithMD = $"{e.Uri.AbsolutePath}.md";
             if (!string.IsNullOrEmpty(urlWithMD) && File.Exists(urlWithMD))
             {
+                if (_historyIndex < _history.Count - 1)
+                {
+                    _history.RemoveRange(_historyIndex + 1, _history.Count - (_historyIndex + 1));
+                }
+
+                _history.Add(urlWithMD);
+                ++_historyIndex;
                 string mainMarkdown = File.ReadAllText(urlWithMD);
                 if (url != "Home")
                 {
@@ -139,6 +149,12 @@ namespace MDocReader
             SidebarGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
             FooterGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
             FileListGridSplitter.BorderBrush = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.GridSplitterBorder));
+
+            ToolBar.Background = new SolidColorBrush(ThemeHelper.ParseRgbString(ThemeHelper.BackgroundColorToolBar));
+            BackBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.BackBtnUri));
+            ForwardBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ForwardBtnUri));
+            FileListBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.FileListBtnUri));
+            ChangeThemeBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ChangeThemeBtnUri));
         }
 
         private void FileListBtnClick(object sender, RoutedEventArgs e)
@@ -160,6 +176,38 @@ namespace MDocReader
         private void ChangeTheme(object sender, RoutedEventArgs e)
         {
             ChangeTheme();
+        }
+
+        private void BackBtnClick(object sender, RoutedEventArgs e)
+        {
+            if (_historyIndex - 1 < 0)
+            {
+                return;
+            }
+            _mainPath = _history[--_historyIndex];
+            string mainMarkdown = File.ReadAllText(_mainPath);
+            string url = Path.GetFileNameWithoutExtension(_mainPath);
+            if (url != "Home")
+            {
+                mainMarkdown = $"# {url}\n{mainMarkdown}";
+            }
+            MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
+        }
+
+        private void ForwardBtnClick(object sender, RoutedEventArgs e)
+        {
+            if (_historyIndex + 1 > _history.Count - 1)
+            {
+                return;
+            }
+            _mainPath = _history[++_historyIndex];
+            string mainMarkdown = File.ReadAllText(_mainPath);
+            string url = Path.GetFileNameWithoutExtension(_mainPath);
+            if (url != "Home")
+            {
+                mainMarkdown = $"# {url}\n{mainMarkdown}";
+            }
+            MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
         }
     }
 }

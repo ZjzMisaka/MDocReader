@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resource\left-black.png" />
+    <None Remove="Resource\left-white.png" />
     <None Remove="Resource\list-view-black.png" />
     <None Remove="Resource\list-view-white.png" />
+    <None Remove="Resource\right-black.png" />
+    <None Remove="Resource\right-white.png" />
     <None Remove="Resource\theme-black.png" />
     <None Remove="Resource\theme-white.png" />
   </ItemGroup>
@@ -18,10 +22,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resource\left-black.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\left-white.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resource\list-view-black.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resource\list-view-white.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\right-black.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\right-white.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resource\theme-black.png">
