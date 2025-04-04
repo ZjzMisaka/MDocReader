@@ -137,7 +137,7 @@ namespace MDocReader
             using (var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(
                 $@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION"))
             {
-                key?.SetValue(appName, 11001, Microsoft.Win32.RegistryValueKind.DWord); // 11001 对应 IE11
+                key?.SetValue(appName, 11001, Microsoft.Win32.RegistryValueKind.DWord);
             }
         }
 
