@@ -14,6 +14,8 @@
     <None Remove="Resource\list-view-white.png" />
     <None Remove="Resource\right-black.png" />
     <None Remove="Resource\right-white.png" />
+    <None Remove="Resource\save-black.png" />
+    <None Remove="Resource\save-white.png" />
     <None Remove="Resource\theme-black.png" />
     <None Remove="Resource\theme-white.png" />
   </ItemGroup>
@@ -39,6 +41,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resource\right-white.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\save-black.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\save-white.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resource\theme-black.png">

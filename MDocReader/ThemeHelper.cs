@@ -274,6 +274,21 @@ namespace MDocReader
             }
         }
 
+        public static Uri SaveBtnUri
+        {
+            get
+            {
+                if (Theme == Theme.Dark)
+                {
+                    return new Uri(@"pack://application:,,,/Resource/save-white.png", UriKind.RelativeOrAbsolute);
+                }
+                else
+                {
+                    return new Uri(@"pack://application:,,,/Resource/save-black.png", UriKind.RelativeOrAbsolute);
+                }
+            }
+        }
+
         public static Color ParseRgbString(string rgb)
         {
             string values = rgb.Replace("rgb(", "").Replace(")", "");

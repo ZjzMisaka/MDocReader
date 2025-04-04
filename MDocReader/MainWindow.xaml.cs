@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Xml.Linq;
 
 namespace MDocReader
 {
@@ -24,9 +26,17 @@ namespace MDocReader
         {
             InitializeComponent();
 
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string folderName = Path.GetFileName(currentDirectory);
-            this.Title = folderName;
+            if (ExeResourceManager.GetPersistedFilesList() != null)
+            {
+                MDHelper.Persistenced = true;
+                this.Title = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
+            }
+            else
+            {
+                string currentDirectory = Directory.GetCurrentDirectory();
+                string folderName = Path.GetFileName(currentDirectory);
+                this.Title = folderName;
+            }
 
             SetBrowserFeatureControl();
             LoadMarkdownFiles();
@@ -39,18 +49,18 @@ namespace MDocReader
         private void LoadMarkdownFiles()
         {
             string mainFilePath = _mainPath;
-            if (File.Exists(mainFilePath))
+            if (FileNameExist(mainFilePath))
             {
                 _history.Add(new History(_mainPath, _mainFragment));
                 ++_historyIndex;
-                string mainMarkdown = File.ReadAllText(mainFilePath);
+                string mainMarkdown = ReadFile(mainFilePath);
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
 
             string sidebarFilePath = _sidebarPath;
-            if (File.Exists(sidebarFilePath))
+            if (FileNameExist(sidebarFilePath))
             {
-                string sidebarMarkdown = File.ReadAllText(sidebarFilePath);
+                string sidebarMarkdown = ReadFile(sidebarFilePath);
                 if (!string.IsNullOrWhiteSpace(sidebarMarkdown))
                 {
                     SidebarWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(sidebarMarkdown));
@@ -60,9 +70,9 @@ namespace MDocReader
             }
 
             string footerFilePath = _footerPath;
-            if (File.Exists(footerFilePath))
+            if (FileNameExist(footerFilePath))
             {
-                string footerMarkdown = File.ReadAllText(footerFilePath);
+                string footerMarkdown = ReadFile(footerFilePath);
                 if (!string.IsNullOrWhiteSpace(footerMarkdown))
                 {
                     FooterWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(footerMarkdown));
@@ -83,14 +93,14 @@ namespace MDocReader
             e.Cancel = true;
             string url = Uri.UnescapeDataString(e.Uri.AbsolutePath);
             string urlWithMD = $"{e.Uri.AbsolutePath}.md";
-            if (!string.IsNullOrEmpty(urlWithMD) && File.Exists(urlWithMD))
+            if (!string.IsNullOrEmpty(urlWithMD) && FileNameExist(urlWithMD))
             {
                 if (_historyIndex < _history.Count - 1)
                 {
                     _history.RemoveRange(_historyIndex + 1, _history.Count - (_historyIndex + 1));
                 }
 
-                string mainMarkdown = File.ReadAllText(urlWithMD);
+                string mainMarkdown = ReadFile(urlWithMD);
                 if (url != "Home")
                 {
                     mainMarkdown = $"# {url}\n{mainMarkdown}";
@@ -149,6 +159,7 @@ namespace MDocReader
             ForwardBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ForwardBtnUri));
             FileListBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.FileListBtnUri));
             ChangeThemeBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.ChangeThemeBtnUri));
+            SaveThemeBtn.Background = new ImageBrush(new BitmapImage(ThemeHelper.SaveBtnUri));
         }
 
         private void FileListBtnClick(object sender, RoutedEventArgs e)
@@ -181,7 +192,7 @@ namespace MDocReader
             --_historyIndex;
             _mainPath = _history[_historyIndex].Path;
             _mainFragment = _history[_historyIndex].Fragment;
-            string mainMarkdown = File.ReadAllText(_mainPath);
+            string mainMarkdown = ReadFile(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
             {
@@ -199,13 +210,50 @@ namespace MDocReader
             ++_historyIndex;
             _mainPath = _history[_historyIndex].Path;
             _mainFragment = _history[_historyIndex].Fragment;
-            string mainMarkdown = File.ReadAllText(_mainPath);
+            string mainMarkdown = ReadFile(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
             {
                 mainMarkdown = $"# {url}\n{mainMarkdown}";
             }
             MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
+        }
+
+        private void Save(object sender, RoutedEventArgs e)
+        {
+            Dictionary<string, string> filesToPersist = new Dictionary<string, string>();
+            string currentDirectory = Directory.GetCurrentDirectory();
+            List<string> fileList = Directory.GetFiles(currentDirectory, "*.md").ToList();
+            foreach (var file in fileList)
+            {
+                string shortFileName = Path.GetFileName(file);
+                filesToPersist.Add(shortFileName, File.ReadAllText(file));
+            }
+            ExeResourceManager.PersistTextFiles(filesToPersist);
+        }
+
+        private string ReadFile(string name)
+        {
+            if (MDHelper.Persistenced)
+            {
+                return ExeResourceManager.ReadTextFile(name);
+            }
+            else
+            {
+                return File.ReadAllText(name);
+            }
+        }
+
+        private bool FileNameExist(string name)
+        {
+            if (MDHelper.Persistenced)
+            {
+                return ExeResourceManager.GetPersistedFilesList().Contains(name);
+            }
+            else
+            {
+                return File.Exists(name);
+            }
         }
     }
 }

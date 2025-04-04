@@ -6,15 +6,30 @@ using System.Threading.Tasks;
 using Markdig.Extensions.AutoIdentifiers;
 using Markdig;
 using System.IO;
+using System.Windows.Documents;
 
 namespace MDocReader
 {
     internal class MDHelper
     {
+        internal static bool Persistenced { get; set; }
+
+        internal static List<string> GetFilesList()
+        {
+            if (Persistenced)
+            {
+                return ExeResourceManager.GetPersistedFilesList();
+            }
+            else
+            {
+                string currentDirectory = Directory.GetCurrentDirectory();
+                return Directory.GetFiles(currentDirectory, "*.md").ToList();
+            }
+        }
+
         internal static string GetMarkdownFileNames()
         {
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string[] markdownFiles = Directory.GetFiles(currentDirectory, "*.md");
+            List<string> markdownFiles = GetFilesList();
             string result = "";
             foreach (string filePath in markdownFiles)
             {
