@@ -46,13 +46,23 @@ namespace MDocReader
             FileListWebBrowser.Navigating += WebBrowserNavigating;
         }
 
+        private void AddHistory(History history)
+        {
+            History last = _history.LastOrDefault();
+            if (last != default && last.Path == history.Path && last.Fragment == history.Fragment)
+            {
+                return;
+            }
+            _history.Add(history);
+            ++_historyIndex;
+        }
+
         private void LoadMarkdownFiles()
         {
             string mainFilePath = _mainPath;
             if (FileNameExist(mainFilePath))
             {
-                _history.Add(new History(_mainPath, _mainFragment));
-                ++_historyIndex;
+                AddHistory(new History(_mainPath, _mainFragment));
                 string mainMarkdown = ReadFile(mainFilePath);
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
@@ -107,8 +117,7 @@ namespace MDocReader
                 }
                 _mainPath = urlWithMD;
                 _mainFragment = e.Uri.Fragment;
-                _history.Add(new History(_mainPath, _mainFragment));
-                ++_historyIndex;
+                AddHistory(new History(_mainPath, _mainFragment));
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, e.Uri.Fragment));
             }
             else
