@@ -161,11 +161,16 @@ public class ExeResourceManager
         string exePath = Process.GetCurrentProcess().MainModule.FileName;
         string currentDirectory = Directory.GetCurrentDirectory();
         string folderName = Path.GetFileName(currentDirectory);
-        string tempExePath = Path.Combine(Directory.GetCurrentDirectory(), folderName + "-" + Guid.NewGuid().ToString() + ".exe");
+        string newExePath = Path.Combine(Directory.GetCurrentDirectory(), folderName + ".exe");
+        if (File.Exists(newExePath))
+        {
+            newExePath = Path.Combine(Directory.GetCurrentDirectory(), folderName + "-" + Guid.NewGuid().ToString() + ".exe");
+        }
+        string scriptPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".bat");
 
-        File.Copy(exePath, tempExePath, true);
+        File.Copy(exePath, newExePath, true);
 
-        IntPtr handle = BeginUpdateResource(tempExePath, false);
+        IntPtr handle = BeginUpdateResource(newExePath, false);
         if (handle != IntPtr.Zero)
         {
             try
@@ -185,6 +190,26 @@ public class ExeResourceManager
                 EndUpdateResource(handle, true);
                 throw;
             }
+
+            Process.Start(newExePath);
+
+            //string script = $@"
+            //    @echo off
+            //    :WAIT
+            //    tasklist /FI ""IMAGENAME eq {Path.GetFileName(exePath)}"" 2>NUL | find /I ""{Path.GetFileName(exePath)}"" >NUL
+            //    if %ERRORLEVEL% == 0 (
+            //        timeout /t 1 /nobreak >NUL
+            //        goto WAIT
+            //    )
+            //    del ""{exePath}""
+            //    del ""{scriptPath}""
+            //    ";
+
+            //File.WriteAllText(scriptPath, script);
+
+            //Process.Start(scriptPath);
+
+            //Environment.Exit(0);
         }
     }
 }
