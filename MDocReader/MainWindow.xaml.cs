@@ -30,6 +30,7 @@ namespace MDocReader
             {
                 MDHelper.Persistenced = true;
                 this.Title = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
+                SaveThemeBtn.Visibility = Visibility.Collapsed;
             }
             else
             {
