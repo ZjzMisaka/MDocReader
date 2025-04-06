@@ -149,21 +149,22 @@ namespace MDocReader
                 if (e.Key == Key.T)
                 {
                     ChangeTheme();
+                    e.Handled = true;
                 }
                 else if (e.Key == Key.S)
                 {
                     Save();
+                    e.Handled = true;
                 }
-            }
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-            {
-                if (e.Key == Key.Left)
+                else if (e.Key == Key.Left)
                 {
                     Back();
+                    e.Handled = true;
                 }
                 else if (e.Key == Key.Right)
                 {
                     Forward();
+                    e.Handled = true;
                 }
             }
         }
