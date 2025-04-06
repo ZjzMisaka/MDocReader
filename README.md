@@ -8,7 +8,7 @@ Extract the files from the compressed package into the wiki folder (at the same 
 ### Gif
 ![Gif](https://github.com/user-attachments/assets/80a41a00-0d02-4c18-91cd-22f24dec9373)
 
-### Operations
+### Features
 - History: You can review your browsing history.
 - File list: You can browse the complete list of files.
 - Themes: The software offers two themes: Light and Dark.
