@@ -1,43 +1,15 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
 
 public class ExeResourceManager
 {
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr BeginUpdateResource(string pFileName, bool bDeleteExistingResources);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool EndUpdateResource(IntPtr hUpdate, bool fDiscard);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool UpdateResource(IntPtr hUpdate, IntPtr lpType, string lpName, ushort wLanguage, byte[] lpData, uint cbData);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    private static extern IntPtr FindResource(IntPtr hModule, string lpName, IntPtr lpType);
-
-    [DllImport("kernel32.dll")]
-    private static extern IntPtr LoadResource(IntPtr hModule, IntPtr hResInfo);
-
-    [DllImport("kernel32.dll")]
-    private static extern IntPtr LockResource(IntPtr hResData);
-
-    [DllImport("kernel32.dll")]
-    private static extern uint SizeofResource(IntPtr hModule, IntPtr hResInfo);
-
-    [DllImport("kernel32.dll")]
-    private static extern IntPtr LoadLibrary(string lpFileName);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool FreeLibrary(IntPtr hModule);
-
-    private static readonly IntPtr RT_RCDATA = new IntPtr(10);
     private const string FILE_INDEX_RESOURCE = "FILE_INDEX";
     private const char FILE_SEPARATOR = '|';
+
+    private static readonly byte[] DATA_MARKER = Encoding.ASCII.GetBytes("MDEXEDATA");
 
     public static void PersistTextFiles(Dictionary<string, string> files)
     {
@@ -80,7 +52,9 @@ public class ExeResourceManager
     private static List<string> DeserializeFileList(string serializedList)
     {
         if (string.IsNullOrEmpty(serializedList))
+        {
             return new List<string>();
+        }
 
         string[] encodedNames = serializedList.Split(FILE_SEPARATOR);
         List<string> fileNames = new List<string>();
@@ -109,51 +83,49 @@ public class ExeResourceManager
 
     public static string ReadTextFile(string filePath)
     {
-        string resourceName = GetResourceNameFromFilePath(filePath);
-
-        IntPtr hModule = LoadLibrary(Process.GetCurrentProcess().MainModule.FileName);
-        if (hModule == IntPtr.Zero) return null;
-
-        try
+        string resourceName = filePath;
+        string exePath = Process.GetCurrentProcess().MainModule.FileName;
+        if (!File.Exists(exePath))
         {
-            IntPtr hResInfo = FindResource(hModule, resourceName, RT_RCDATA);
-            if (hResInfo == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            IntPtr hResData = LoadResource(hModule, hResInfo);
-            if (hResData == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            IntPtr pResData = LockResource(hResData);
-            if (pResData == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            uint size = SizeofResource(hModule, hResInfo);
-            byte[] buffer = new byte[size];
-            Marshal.Copy(pResData, buffer, 0, (int)size);
-
-            return Encoding.UTF8.GetString(buffer);
+            return null;
         }
-        finally
+        byte[] allData = File.ReadAllBytes(exePath);
+        int markerLength = DATA_MARKER.Length;
+        int footerLength = markerLength + 4;
+        if (allData.Length < footerLength)
         {
-            FreeLibrary(hModule);
+            return null;
         }
-    }
-
-    private static string GetResourceNameFromFilePath(string filePath)
-    {
-        if (filePath == FILE_INDEX_RESOURCE)
+        int footerOffset = allData.Length - footerLength;
+        byte[] footer = new byte[footerLength];
+        Array.Copy(allData, footerOffset, footer, 0, footerLength);
+        bool markerMatches = true;
+        for (int i = 0; i < markerLength; i++)
         {
-            return FILE_INDEX_RESOURCE;
+            if (footer[4 + i] != DATA_MARKER[i])
+            {
+                markerMatches = false;
+                break;
+            }
         }
-
-        return "File_" + filePath.Replace("\\", "_").Replace("/", "_").Replace(".", "_").Replace(" ", "_");
+        if (!markerMatches)
+        {
+            return null;
+        }
+        int dataBlockLength = BitConverter.ToInt32(footer, 0);
+        int dataBlockOffset = allData.Length - footerLength - dataBlockLength;
+        if (dataBlockOffset < 0)
+        {
+            return null;
+        }
+        byte[] dataBlock = new byte[dataBlockLength];
+        Array.Copy(allData, dataBlockOffset, dataBlock, 0, dataBlockLength);
+        Dictionary<string, string> resources = DeserializeFiles(dataBlock);
+        if (resources != null && resources.ContainsKey(resourceName))
+        {
+            return resources[resourceName];
+        }
+        return null;
     }
 
     private static void UpdateResource(Dictionary<string, string> files)
@@ -170,46 +142,88 @@ public class ExeResourceManager
 
         File.Copy(exePath, newExePath, true);
 
-        IntPtr handle = BeginUpdateResource(newExePath, false);
-        if (handle != IntPtr.Zero)
+        byte[] serializedDataBlock = SerializeFiles(files);
+        using (FileStream fs = new FileStream(newExePath, FileMode.Append, FileAccess.Write))
         {
-            try
-            {
-                foreach (var entry in files)
-                {
-                    string resourceName = GetResourceNameFromFilePath(entry.Key);
-                    byte[] dataBytes = Encoding.UTF8.GetBytes(entry.Value);
-
-                    bool res = UpdateResource(handle, RT_RCDATA, resourceName, 0, dataBytes, (uint)dataBytes.Length);
-                }
-
-                EndUpdateResource(handle, false);
-            }
-            catch
-            {
-                EndUpdateResource(handle, true);
-                throw;
-            }
-
-            Process.Start(newExePath);
-
-            //string script = $@"
-            //    @echo off
-            //    :WAIT
-            //    tasklist /FI ""IMAGENAME eq {Path.GetFileName(exePath)}"" 2>NUL | find /I ""{Path.GetFileName(exePath)}"" >NUL
-            //    if %ERRORLEVEL% == 0 (
-            //        timeout /t 1 /nobreak >NUL
-            //        goto WAIT
-            //    )
-            //    del ""{exePath}""
-            //    del ""{scriptPath}""
-            //    ";
-
-            //File.WriteAllText(scriptPath, script);
-
-            //Process.Start(scriptPath);
-
-            //Environment.Exit(0);
+            fs.Write(serializedDataBlock, 0, serializedDataBlock.Length);
+            byte[] lengthBytes = BitConverter.GetBytes(serializedDataBlock.Length);
+            fs.Write(lengthBytes, 0, lengthBytes.Length);
+            fs.Write(DATA_MARKER, 0, DATA_MARKER.Length);
         }
+
+        Process.Start(newExePath);
+
+        //string script = $@"
+        //    @echo off
+        //    :WAIT
+        //    tasklist /FI ""IMAGENAME eq {Path.GetFileName(exePath)}"" 2>NUL | find /I ""{Path.GetFileName(exePath)}"" >NUL
+        //    if %ERRORLEVEL% == 0 (
+        //        timeout /t 1 /nobreak >NUL
+        //        goto WAIT
+        //    )
+        //    del ""{exePath}""
+        //    del ""{scriptPath}""
+        //    ";
+
+        //File.WriteAllText(scriptPath, script);
+        //Process.Start(scriptPath);
+
+        //Environment.Exit(0);
+    }
+
+    private static byte[] SerializeFiles(Dictionary<string, string> files)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            foreach (var kvp in files)
+            {
+                byte[] keyBytes = Encoding.UTF8.GetBytes(kvp.Key);
+                byte[] valueBytes = Encoding.UTF8.GetBytes(kvp.Value);
+
+                ms.Write(BitConverter.GetBytes(keyBytes.Length), 0, 4);
+                ms.Write(keyBytes, 0, keyBytes.Length);
+                ms.Write(BitConverter.GetBytes(valueBytes.Length), 0, 4);
+                ms.Write(valueBytes, 0, valueBytes.Length);
+            }
+            return ms.ToArray();
+        }
+    }
+
+    private static Dictionary<string, string> DeserializeFiles(byte[] data)
+    {
+        Dictionary<string, string> result = new Dictionary<string, string>();
+        using (MemoryStream ms = new MemoryStream(data))
+        {
+            while (ms.Position < ms.Length)
+            {
+                byte[] intBuffer = new byte[4];
+                if (ms.Read(intBuffer, 0, 4) != 4)
+                {
+                    break;
+                }
+                int keyLength = BitConverter.ToInt32(intBuffer, 0);
+                byte[] keyBuffer = new byte[keyLength];
+                if (ms.Read(keyBuffer, 0, keyLength) != keyLength)
+                {
+                    break;
+                }
+                string key = Encoding.UTF8.GetString(keyBuffer);
+
+                if (ms.Read(intBuffer, 0, 4) != 4)
+                {
+                    break;
+                }
+                int valueLength = BitConverter.ToInt32(intBuffer, 0);
+                byte[] valueBuffer = new byte[valueLength];
+                if (ms.Read(valueBuffer, 0, valueLength) != valueLength)
+                {
+                    break;
+                }
+                string value = Encoding.UTF8.GetString(valueBuffer);
+
+                result[key] = value;
+            }
+        }
+        return result;
     }
 }
