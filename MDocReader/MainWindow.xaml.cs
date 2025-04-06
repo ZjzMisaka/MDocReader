@@ -166,6 +166,11 @@ namespace MDocReader
                     Forward();
                     e.Handled = true;
                 }
+                else if (e.Key == Key.B)
+                {
+                    SwitchFileList();
+                    e.Handled = true;
+                }
             }
         }
 
@@ -189,6 +194,11 @@ namespace MDocReader
         }
 
         private void FileListBtnClick(object sender, RoutedEventArgs e)
+        {
+            SwitchFileList();
+        }
+
+        private void SwitchFileList()
         {
             FileListWebBrowser.Visibility = FileListWebBrowser.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
             FileListGridSplitter.Visibility = FileListWebBrowser.Visibility;
