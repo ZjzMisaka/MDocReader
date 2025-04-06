@@ -262,6 +262,10 @@ namespace MDocReader
 
         private void Save()
         {
+            if (MDHelper.Persistenced)
+            {
+                return;
+            }
             Dictionary<string, string> filesToPersist = new Dictionary<string, string>();
             string currentDirectory = Directory.GetCurrentDirectory();
             List<string> fileList = Directory.GetFiles(currentDirectory, "*.md").ToList();
