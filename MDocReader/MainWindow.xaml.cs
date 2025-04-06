@@ -151,7 +151,7 @@ namespace MDocReader
                     ChangeTheme();
                     e.Handled = true;
                 }
-                else if (e.Key == Key.S)
+                else if ((Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) && e.Key == Key.S)
                 {
                     Save();
                     e.Handled = true;
