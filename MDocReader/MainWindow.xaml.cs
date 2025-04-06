@@ -67,7 +67,7 @@ namespace MDocReader
                 string mainMarkdown = ReadFile(mainFilePath);
                 MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
             }
-            
+
             string sidebarFilePath = _sidebarPath;
             if (FileNameExist(sidebarFilePath))
             {
@@ -245,7 +245,7 @@ namespace MDocReader
                 mainMarkdown = $"# {url}\n{mainMarkdown}";
             }
             MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
-        } 
+        }
 
         private void Forward()
         {
