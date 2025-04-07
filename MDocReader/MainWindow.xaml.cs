@@ -22,6 +22,8 @@ namespace MDocReader
         private List<History> _history = new List<History>();
         private int _historyIndex = -1;
 
+        private double _fileListWebBrowserWidth = 250;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -202,6 +204,16 @@ namespace MDocReader
         {
             FileListWebBrowser.Visibility = FileListWebBrowser.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
             FileListGridSplitter.Visibility = FileListWebBrowser.Visibility;
+
+            if (FileListWebBrowser.Visibility == Visibility.Visible)
+            {
+                FileListWebBrowserColumn.Width = new GridLength(_fileListWebBrowserWidth);
+            }
+            else
+            {
+                _fileListWebBrowserWidth = FileListWebBrowserColumn.Width.Value;
+                FileListWebBrowserColumn.Width = new GridLength(0);
+            }
 
             ShowFileList();
         }
