@@ -16,7 +16,7 @@ Extract the files from the compressed package into the wiki folder (at the same 
 
 ### Shortcuts
 - Ctrl + Left to back.
-- Ctrl + Right to dorward.
+- Ctrl + Right to forward.
 - Ctrl + B to view file list.
 - Press Ctrl + T to switch themes.
 - Press Ctrl + Shift + S to persist the document.
