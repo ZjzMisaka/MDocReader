@@ -63,7 +63,7 @@ namespace MDocReader
         private void LoadMarkdownFiles()
         {
             string mainFilePath = _mainPath;
-            if (FileNameExist(mainFilePath))
+            if (MDHelper.FileNameExist(mainFilePath))
             {
                 AddHistory(new History(_mainPath, _mainFragment));
                 string mainMarkdown = ReadFile(mainFilePath);
@@ -71,7 +71,7 @@ namespace MDocReader
             }
 
             string sidebarFilePath = _sidebarPath;
-            if (FileNameExist(sidebarFilePath))
+            if (MDHelper.FileNameExist(sidebarFilePath))
             {
                 string sidebarMarkdown = ReadFile(sidebarFilePath);
                 if (!string.IsNullOrWhiteSpace(sidebarMarkdown))
@@ -83,7 +83,7 @@ namespace MDocReader
             }
 
             string footerFilePath = _footerPath;
-            if (FileNameExist(footerFilePath))
+            if (MDHelper.FileNameExist(footerFilePath))
             {
                 string footerMarkdown = ReadFile(footerFilePath);
                 if (!string.IsNullOrWhiteSpace(footerMarkdown))
@@ -106,7 +106,7 @@ namespace MDocReader
             e.Cancel = true;
             string url = Uri.UnescapeDataString(e.Uri.AbsolutePath);
             string urlWithMD = $"{e.Uri.AbsolutePath}.md";
-            if (!string.IsNullOrEmpty(urlWithMD) && FileNameExist(urlWithMD))
+            if (!string.IsNullOrEmpty(urlWithMD) && MDHelper.FileNameExist(urlWithMD))
             {
                 if (_historyIndex < _history.Count - 1)
                 {
@@ -308,18 +308,6 @@ namespace MDocReader
             else
             {
                 return File.ReadAllText(name);
-            }
-        }
-
-        private bool FileNameExist(string name)
-        {
-            if (MDHelper.Persistenced)
-            {
-                return ExeResourceManager.GetPersistedFilesList().Contains(name);
-            }
-            else
-            {
-                return File.Exists(name);
             }
         }
     }

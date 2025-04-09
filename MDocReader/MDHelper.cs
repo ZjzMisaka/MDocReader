@@ -7,6 +7,7 @@ using Markdig.Extensions.AutoIdentifiers;
 using Markdig;
 using System.IO;
 using System.Windows.Documents;
+using System.Text.RegularExpressions;
 
 namespace MDocReader
 {
@@ -75,6 +76,7 @@ namespace MDocReader
 
             var pipeline = new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub).UseAdvancedExtensions().Build();
             string htmlContent = Markdown.ToHtml(markdown, pipeline);
+            htmlContent = ProcessImgTags(htmlContent);
 
             return $@"
 {GetHtmlStart()}
@@ -178,6 +180,46 @@ namespace MDocReader
                         </style>
 
                     </head>";
+        }
+
+        private static string ProcessImgTags(string htmlContent)
+        {
+            if (string.IsNullOrWhiteSpace(htmlContent))
+            {
+                return htmlContent;
+            }
+
+            string imgTagPattern = @"<img\s+[^>]*src=['""]([^'""]+)['""][^>]*>";
+            var matches = Regex.Matches(htmlContent, imgTagPattern);
+
+            foreach (Match match in matches)
+            {
+                string imgTag = match.Value;
+                string srcValue = match.Groups[1].Value;
+
+                if (FileNameExist(srcValue))
+                {
+                    string fullPath = Path.GetFullPath(srcValue);
+                    string newSrc = "file:///" + fullPath.Replace("\\", "/");
+                    string updatedImgTag = imgTag.Replace(srcValue, newSrc);
+
+                    htmlContent = htmlContent.Replace(imgTag, updatedImgTag);
+                }
+            }
+
+            return htmlContent;
+        }
+
+        public static bool FileNameExist(string name)
+        {
+            if (MDHelper.Persistenced)
+            {
+                return ExeResourceManager.GetPersistedFilesList().Contains(name);
+            }
+            else
+            {
+                return File.Exists(name);
+            }
         }
     }
 }
