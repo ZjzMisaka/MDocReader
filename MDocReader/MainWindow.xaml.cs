@@ -296,6 +296,14 @@ namespace MDocReader
                 string shortFileName = Path.GetFileName(file);
                 filesToPersist.Add(shortFileName, File.ReadAllText(file));
             }
+            List<string> imageFiles = MDHelper.GetImageFilesInCurrentDirectory();
+            foreach (var file in imageFiles)
+            {
+                string shortFileName = file;
+                byte[] pngBytes = File.ReadAllBytes(shortFileName);
+                string base64String = Convert.ToBase64String(pngBytes);
+                filesToPersist.Add(shortFileName, base64String);
+            }
             ExeResourceManager.PersistTextFiles(filesToPersist);
         }
 

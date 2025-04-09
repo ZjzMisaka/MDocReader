@@ -8,6 +8,7 @@ using Markdig;
 using System.IO;
 using System.Windows.Documents;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace MDocReader
 {
@@ -26,6 +27,40 @@ namespace MDocReader
                 string currentDirectory = Directory.GetCurrentDirectory();
                 return Directory.GetFiles(currentDirectory, "*.md").ToList();
             }
+        }
+
+        internal static List<string> GetImageFilesInCurrentDirectory()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            string[] imageExtensions = { ".jpeg", ".jpg", ".png", ".gif", ".bmp", ".svg", ".ico" };
+
+            List<string> imageFiles = new List<string>();
+
+            foreach (var file in Directory.EnumerateFiles(currentDirectory, "*.*", SearchOption.AllDirectories))
+            {
+                if (Array.Exists(imageExtensions, ext => ext.Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase)))
+                {
+                    imageFiles.Add(GetRelativePath(currentDirectory, file));
+                }
+            }
+
+            return imageFiles;
+        }
+
+        private static string GetRelativePath(string basePath, string fullPath)
+        {
+            if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                basePath += Path.DirectorySeparatorChar;
+            }
+
+            Uri baseUri = new Uri(basePath, UriKind.Absolute);
+            Uri fullUri = new Uri(fullPath, UriKind.Absolute);
+
+            Uri relativeUri = baseUri.MakeRelativeUri(fullUri);
+
+            return Uri.UnescapeDataString(relativeUri.ToString()).Replace('/', Path.DirectorySeparatorChar);
         }
 
         internal static string GetMarkdownFileNames()
@@ -196,13 +231,26 @@ namespace MDocReader
             {
                 string imgTag = match.Value;
                 string srcValue = match.Groups[1].Value;
+                string srcValueSearch = srcValue;
 
-                if (FileNameExist(srcValue))
+                if (srcValueSearch.StartsWith("./"))
+                {
+                    srcValueSearch = srcValueSearch.Substring(2);
+                }
+                srcValueSearch = srcValueSearch.Replace("/", "\\");
+
+                if (!MDHelper.Persistenced && FileNameExist(srcValue))
                 {
                     string fullPath = Path.GetFullPath(srcValue);
                     string newSrc = "file:///" + fullPath.Replace("\\", "/");
                     string updatedImgTag = imgTag.Replace(srcValue, newSrc);
 
+                    htmlContent = htmlContent.Replace(imgTag, updatedImgTag);
+                }
+                if (MDHelper.Persistenced && FileNameExist(srcValueSearch))
+                {
+                    string base64String = ExeResourceManager.ReadTextFile(srcValueSearch);
+                    string updatedImgTag = imgTag.Replace(srcValue, $"data:image/{Path.GetExtension(srcValue)};base64,{base64String}");
                     htmlContent = htmlContent.Replace(imgTag, updatedImgTag);
                 }
             }
