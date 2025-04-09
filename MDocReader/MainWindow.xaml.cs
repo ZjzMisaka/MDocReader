@@ -14,10 +14,10 @@ namespace MDocReader
 {
     public partial class MainWindow : Window
     {
-        private string _mainPath = "Home.md";
+        private string _mainPath = ".\\Home.md";
         private string _mainFragment = "";
-        private string _sidebarPath = "_Sidebar.md";
-        private string _footerPath = "_Footer.md";
+        private string _sidebarPath = ".\\_Sidebar.md";
+        private string _footerPath = ".\\_Footer.md";
 
         private List<History> _history = new List<History>();
         private int _historyIndex = -1;
@@ -105,7 +105,11 @@ namespace MDocReader
             }
             e.Cancel = true;
             string url = Uri.UnescapeDataString(e.Uri.AbsolutePath);
-            string urlWithMD = $"{e.Uri.AbsolutePath}.md";
+            string urlWithMD = $"{url}.md".Replace('/', Path.DirectorySeparatorChar);
+            if (!urlWithMD.StartsWith($".{Path.DirectorySeparatorChar}"))
+            {
+                urlWithMD = $".{Path.DirectorySeparatorChar}{urlWithMD}";
+            }
             if (!string.IsNullOrEmpty(urlWithMD) && MDHelper.FileNameExist(urlWithMD))
             {
                 if (_historyIndex < _history.Count - 1)
@@ -116,7 +120,7 @@ namespace MDocReader
                 string mainMarkdown = ReadFile(urlWithMD);
                 if (url != "Home")
                 {
-                    mainMarkdown = $"# {url}\n{mainMarkdown}";
+                    mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
                 }
                 _mainPath = urlWithMD;
                 _mainFragment = e.Uri.Fragment;
@@ -254,7 +258,7 @@ namespace MDocReader
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
             {
-                mainMarkdown = $"# {url}\n{mainMarkdown}";
+                mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
             }
             MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
         }
@@ -272,7 +276,7 @@ namespace MDocReader
             string url = Path.GetFileNameWithoutExtension(_mainPath);
             if (url != "Home")
             {
-                mainMarkdown = $"# {url}\n{mainMarkdown}";
+                mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
             }
             MainWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(mainMarkdown, _mainFragment));
         }
@@ -290,10 +294,10 @@ namespace MDocReader
             }
             Dictionary<string, string> filesToPersist = new Dictionary<string, string>();
             string currentDirectory = Directory.GetCurrentDirectory();
-            List<string> fileList = Directory.GetFiles(currentDirectory, "*.md").ToList();
+            List<string> fileList = Directory.GetFiles(currentDirectory, "*.md", SearchOption.AllDirectories).ToList();
             foreach (var file in fileList)
             {
-                string shortFileName = Path.GetFileName(file);
+                string shortFileName = MDHelper.GetRelativePath(Directory.GetCurrentDirectory(), file);
                 filesToPersist.Add(shortFileName, File.ReadAllText(file));
             }
             List<string> imageFiles = MDHelper.GetImageFilesInCurrentDirectory();

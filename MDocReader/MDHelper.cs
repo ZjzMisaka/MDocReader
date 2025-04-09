@@ -25,7 +25,7 @@ namespace MDocReader
             else
             {
                 string currentDirectory = Directory.GetCurrentDirectory();
-                return Directory.GetFiles(currentDirectory, "*.md").ToList();
+                return Directory.GetFiles(currentDirectory, "*.md", SearchOption.AllDirectories).ToList();
             }
         }
 
@@ -48,7 +48,7 @@ namespace MDocReader
             return imageFiles;
         }
 
-        private static string GetRelativePath(string basePath, string fullPath)
+        internal static string GetRelativePath(string basePath, string fullPath)
         {
             if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
             {
@@ -60,7 +60,7 @@ namespace MDocReader
 
             Uri relativeUri = baseUri.MakeRelativeUri(fullUri);
 
-            return Uri.UnescapeDataString(relativeUri.ToString()).Replace('/', Path.DirectorySeparatorChar);
+            return $".{Path.DirectorySeparatorChar}{Uri.UnescapeDataString(relativeUri.ToString()).Replace('/', Path.DirectorySeparatorChar)}";
         }
 
         internal static string GetMarkdownFileNames()
@@ -69,12 +69,36 @@ namespace MDocReader
             string result = "";
             foreach (string filePath in markdownFiles)
             {
+                if (Path.GetExtension(filePath) != ".md")
+                {
+                    continue;
+                }
+
                 string fileName = Path.GetFileName(filePath);
+                string relativePath = fileName;
+                if (!MDHelper.Persistenced)
+                {
+                    relativePath = GetRelativePath(Directory.GetCurrentDirectory(), filePath);
+                }
+                
+                string relativePathWithoutExtension = relativePath.Replace(fileName, Path.GetFileNameWithoutExtension(fileName));
+                string filePathWithoutExtension = filePath.Replace(fileName, Path.GetFileNameWithoutExtension(fileName));
+                if (!relativePathWithoutExtension.StartsWith($".{Path.DirectorySeparatorChar}"))
+                {
+                    relativePathWithoutExtension = $".{Path.DirectorySeparatorChar}{relativePathWithoutExtension}";
+                }
                 if (fileName == "_Sidebar.md" || fileName == "_Footer.md")
                 {
                     continue;
                 }
-                result += $"- [{fileName}]({Path.GetFileNameWithoutExtension(filePath)})\n";
+                if (MDHelper.Persistenced)
+                {
+                    result += $"- [{filePath}]({filePathWithoutExtension})\n";
+                }
+                else
+                {
+                    result += $"- [{relativePath}]({relativePathWithoutExtension})\n";
+                }
             }
 
             return result;
@@ -233,10 +257,6 @@ namespace MDocReader
                 string srcValue = match.Groups[1].Value;
                 string srcValueSearch = srcValue;
 
-                if (srcValueSearch.StartsWith("./"))
-                {
-                    srcValueSearch = srcValueSearch.Substring(2);
-                }
                 srcValueSearch = srcValueSearch.Replace("/", "\\");
 
                 if (!MDHelper.Persistenced && FileNameExist(srcValue))
