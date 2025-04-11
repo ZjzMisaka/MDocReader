@@ -9,10 +9,12 @@ Extract the files from the compressed package into the wiki folder (at the same 
 ![Gif](https://github.com/user-attachments/assets/80a41a00-0d02-4c18-91cd-22f24dec9373)
 
 ### Features
-- History: You can review your browsing history.
-- File list: You can browse the complete list of files.
-- Themes: The software offers two themes: Light and Dark.
-- Persistence: You can persist Markdown wiki documents into an executable file, allowing you to browse the wiki documents anywhere by simply copying the exe file.
+- Allows Markdown files and image files to be saved in subdirectories and accessed in relative paths.
+- You can review your browsing history.
+- You can browse the complete list of files.
+- The software offers two themes: Light and Dark.
+- Browse local pictures by `![img](./img/img.png)`.
+- You can persist Markdown wiki documents (include local pictures) into an executable file, allowing you to browse the wiki documents anywhere by simply copying the exe file.
 
 ### Shortcuts
 - Ctrl + Left to back.
