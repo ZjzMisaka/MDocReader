@@ -89,7 +89,7 @@ namespace MDocReader
                 string footerMarkdown = ReadFile(footerFilePath);
                 if (!string.IsNullOrWhiteSpace(footerMarkdown))
                 {
-                    DocGrid.ColumnDefinitions[2].Width = new GridLength(35, GridUnitType.Pixel);
+                    DocGrid.RowDefinitions[2].Height = new GridLength(35, GridUnitType.Pixel);
                     FooterWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(footerMarkdown));
                     FooterWebBrowser.Visibility = Visibility.Visible;
                     FooterGridSplitter.Visibility = Visibility.Visible;
