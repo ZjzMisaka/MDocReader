@@ -76,6 +76,7 @@ namespace MDocReader
                 string sidebarMarkdown = ReadFile(sidebarFilePath);
                 if (!string.IsNullOrWhiteSpace(sidebarMarkdown))
                 {
+                    DocGrid.ColumnDefinitions[2].Width = new GridLength(250, GridUnitType.Pixel);
                     SidebarWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(sidebarMarkdown));
                     SidebarWebBrowser.Visibility = Visibility.Visible;
                     SidebarGridSplitter.Visibility = Visibility.Visible;
@@ -88,6 +89,7 @@ namespace MDocReader
                 string footerMarkdown = ReadFile(footerFilePath);
                 if (!string.IsNullOrWhiteSpace(footerMarkdown))
                 {
+                    DocGrid.ColumnDefinitions[2].Width = new GridLength(35, GridUnitType.Pixel);
                     FooterWebBrowser.NavigateToString(MDHelper.ConvertMarkdownToHtml(footerMarkdown));
                     FooterWebBrowser.Visibility = Visibility.Visible;
                     FooterGridSplitter.Visibility = Visibility.Visible;

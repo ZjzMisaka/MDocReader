@@ -52,12 +52,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="35" />
+                <RowDefinition Height="0" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
 
             <WebBrowser x:Name="MainWebBrowser" Grid.Row="0" Grid.Column="0" />

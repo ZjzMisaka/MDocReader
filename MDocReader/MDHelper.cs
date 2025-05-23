@@ -80,7 +80,7 @@ namespace MDocReader
                 {
                     relativePath = GetRelativePath(Directory.GetCurrentDirectory(), filePath);
                 }
-                
+
                 string relativePathWithoutExtension = relativePath.Replace(fileName, Path.GetFileNameWithoutExtension(fileName));
                 string filePathWithoutExtension = filePath.Replace(fileName, Path.GetFileNameWithoutExtension(fileName));
                 if (!relativePathWithoutExtension.StartsWith($".{Path.DirectorySeparatorChar}"))
