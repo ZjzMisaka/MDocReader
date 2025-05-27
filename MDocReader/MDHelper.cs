@@ -204,7 +204,6 @@ namespace MDocReader
                                 color: {ThemeHelper.PreForegroundColorText};
                                 padding: 0.2em;
                                 border-radius: 4px;
-                                font-family: Consolas, ""Courier New"", monospace;
                                 font-size: 0.95em;
                                 overflow: auto;
                             }}
@@ -215,7 +214,6 @@ namespace MDocReader
                                 margin: 1em 0;
                                 background-color: {ThemeHelper.PreBackgroundColorText};
                                 color: {ThemeHelper.PreForegroundColorText};
-                                font-family: Arial, sans-serif;
                                 font-size: 0.95em;
                             }}
 
