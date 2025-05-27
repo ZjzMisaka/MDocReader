@@ -120,7 +120,7 @@ namespace MDocReader
                 }
 
                 string mainMarkdown = ReadFile(urlWithMD);
-                if (url != "Home")
+                if (url != "Home" && !mainMarkdown.TrimStart().StartsWith("# "))
                 {
                     mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
                 }
@@ -258,7 +258,7 @@ namespace MDocReader
             _mainFragment = _history[_historyIndex].Fragment;
             string mainMarkdown = ReadFile(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
-            if (url != "Home")
+            if (url != "Home" && !mainMarkdown.TrimStart().StartsWith("# "))
             {
                 mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
             }
@@ -276,7 +276,7 @@ namespace MDocReader
             _mainFragment = _history[_historyIndex].Fragment;
             string mainMarkdown = ReadFile(_mainPath);
             string url = Path.GetFileNameWithoutExtension(_mainPath);
-            if (url != "Home")
+            if (url != "Home" && !mainMarkdown.TrimStart().StartsWith("# "))
             {
                 mainMarkdown = $"# {Path.GetFileName(url)}\n{mainMarkdown}";
             }
