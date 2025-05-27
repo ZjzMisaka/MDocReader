@@ -163,6 +163,7 @@ namespace MDocReader
                             body {{
                                 background-color: {ThemeHelper.BackgroundColorText};
                                 color: {ThemeHelper.ForegroundColorText};
+                                font-family: ""Microsoft YaHei"", ""黑体"", ""SimHei"", Arial, sans-serif;
                             }}
 
                             a {{
