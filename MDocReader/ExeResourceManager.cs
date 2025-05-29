@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Threading;
 
 public class ExeResourceManager
 {
@@ -142,6 +143,11 @@ public class ExeResourceManager
 
         File.Copy(exePath, newExePath, true);
 
+        while (!FileIsReady(newExePath))
+        {
+            Thread.Sleep(100);
+        }
+
         byte[] serializedDataBlock = SerializeFiles(files);
         using (FileStream fs = new FileStream(newExePath, FileMode.Append, FileAccess.Write))
         {
@@ -169,6 +175,21 @@ public class ExeResourceManager
         //Process.Start(scriptPath);
 
         //Environment.Exit(0);
+    }
+
+    private static bool FileIsReady(string filename)
+    {
+        try
+        {
+            using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                return true;
+            }
+        }
+        catch (IOException)
+        {
+            return false;
+        }
     }
 
     private static byte[] SerializeFiles(Dictionary<string, string> files)
